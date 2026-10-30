@@ -1,0 +1,58 @@
+@page
+@model CheckoutModel
+@{
+    ViewData["Title"] = "Pago";
+}
+
+<h1>Finalizar compra</h1>
+
+<div class="Cont_Checkout">
+    <form method="post" class="Form_Checkout">
+        <div asp-validation-summary="ModelOnly" class="Alerta Alerta_Error" role="alert"></div>
+
+        <fieldset>
+            <legend>Tus datos</legend>
+
+            <div class="Campo">
+                <label asp-for="Cliente.Nombre"></label>
+                <input asp-for="Cliente.Nombre" autocomplete="name" />
+                <span asp-validation-for="Cliente.Nombre" class="Error_Campo"></span>
+            </div>
+
+            <div class="Campo">
+                <label asp-for="Cliente.Correo"></label>
+                <input asp-for="Cliente.Correo" autocomplete="email" />
+                <span asp-validation-for="Cliente.Correo" class="Error_Campo"></span>
+            </div>
+
+            <div class="Campo">
+                <label asp-for="Cliente.Telefono"></label>
+                <input asp-for="Cliente.Telefono" autocomplete="tel" />
+                <span asp-validation-for="Cliente.Telefono" class="Error_Campo"></span>
+            </div>
+
+            <div class="Campo">
+                <label asp-for="Cliente.Direccion"></label>
+                <textarea asp-for="Cliente.Direccion" rows="3" autocomplete="street-address"></textarea>
+                <span asp-validation-for="Cliente.Direccion" class="Error_Campo"></span>
+            </div>
+        </fieldset>
+
+        <button type="submit" class="Btn_Princ">Confirmar compra por @Model.Carrito.Total.ToString("C")</button>
+        <a asp-page="/Carrito" class="Btn_Sec">Volver al carrito</a>
+    </form>
+
+    <aside class="Resumen_Orden" aria-labelledby="Titulo_Resumen">
+        <h2 id="Titulo_Resumen">Resumen</h2>
+        <ul>
+            @foreach (var linea in Model.Carrito.Lineas)
+            {
+                <li>
+                    <span>@linea.Cantidad × @linea.Nombre</span>
+                    <span>@linea.Subtotal.ToString("C")</span>
+                </li>
+            }
+        </ul>
+        <p class="Total_Carrito">Total: @Model.Carrito.Total.ToString("C")</p>
+    </aside>
+</div>

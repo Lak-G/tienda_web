@@ -1,0 +1,41 @@
+@page "{id:int}"
+@model ConfirmacionModel
+@{
+    ViewData["Title"] = "Compra confirmada";
+}
+
+<h1>¡Gracias por tu compra!</h1>
+
+<p class="Num_Orden">Tu número de orden es <strong>#@Model.Orden.Id</strong>.</p>
+<p>Enviaremos los detalles a <strong>@Model.Orden.ClienteCorreo</strong>.</p>
+
+<table class="Tabla_Carrito">
+    <caption>Detalle de la orden</caption>
+    <thead>
+        <tr>
+            <th scope="col">Producto</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var linea in Model.Orden.Lineas)
+        {
+            <tr>
+                <th scope="row">@linea.Producto</th>
+                <td data-etiqueta="Precio">@linea.PrecioUnitario.ToString("C")</td>
+                <td data-etiqueta="Cantidad">@linea.Cantidad</td>
+                <td data-etiqueta="Subtotal">@linea.Subtotal.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th scope="row" colspan="3">Total</th>
+            <td class="Total_Carrito">@Model.Orden.Total.ToString("C")</td>
+        </tr>
+    </tfoot>
+</table>
+
+<a asp-page="/Index" class="Btn_Princ">Volver al catálogo</a>

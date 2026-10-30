@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@inject TiendaNube.Web.Services.ICarritoService CarritoService
+@{
+    var articulosEnCarrito = CarritoService.ContarArticulos();
+}
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -12,13 +16,29 @@
             <a class="Nav_Marca" asp-page="/Index">TiendaNube</a>
             <ul class="Nav_Lista">
                 <li><a asp-page="/Index">Catálogo</a></li>
-                <li><a href="/Carrito">Carrito</a></li>
+                <li>
+                    <a asp-page="/Carrito">
+                        Carrito
+                        @if (articulosEnCarrito > 0)
+                        {
+                            <span class="Contador_Carrito">(@articulosEnCarrito<span class="Solo_Lector"> artículos</span>)</span>
+                        }
+                    </a>
+                </li>
                 <li><a href="/Admin">Admin</a></li>
             </ul>
         </nav>
     </header>
 
     <main class="Cont_Principal">
+        @if (TempData["Mensaje"] is string mensaje)
+        {
+            <p class="Alerta Alerta_Exito" role="status">@mensaje</p>
+        }
+        @if (TempData["Error"] is string error)
+        {
+            <p class="Alerta Alerta_Error" role="alert">@error</p>
+        }
         @RenderBody()
     </main>
 

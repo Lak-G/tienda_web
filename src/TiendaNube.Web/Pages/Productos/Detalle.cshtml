@@ -26,6 +26,13 @@
         @if (Model.Producto.Stock > 0)
         {
             <p class="Detalle_Stock">Disponible: @Model.Producto.Stock</p>
+
+            <form method="post" asp-page="/Carrito" asp-page-handler="Agregar" class="Form_Agregar">
+                <input type="hidden" name="productoId" value="@Model.Producto.Id" />
+                <label for="Cantidad">Cantidad</label>
+                <input id="Cantidad" type="number" name="cantidad" value="1" min="1" max="@Model.Producto.Stock" required />
+                <button type="submit" class="Btn_Princ">Agregar al carrito</button>
+            </form>
         }
         else
         {

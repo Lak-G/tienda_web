@@ -1,0 +1,90 @@
+@page
+@model CarritoModel
+@{
+    ViewData["Title"] = "Carrito";
+}
+
+<h1>Carrito</h1>
+
+@foreach (var aviso in Model.Carrito.Avisos)
+{
+    <p class="Alerta Alerta_Aviso" role="status">@aviso</p>
+}
+
+@if (Model.Carrito.EstaVacio)
+{
+    <div class="Estado_Vacio">
+        <p>Tu carrito está vacío.</p>
+        <a asp-page="/Index" class="Btn_Princ">Ir al catálogo</a>
+    </div>
+}
+else
+{
+    <table class="Tabla_Carrito">
+        <caption class="Solo_Lector">Productos en tu carrito</caption>
+        <thead>
+            <tr>
+                <th scope="col">Producto</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">Subtotal</th>
+                <th scope="col"><span class="Solo_Lector">Acciones</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var linea in Model.Carrito.Lineas)
+            {
+                <tr class="@(linea.HayStockSuficiente ? null : "Fila_Sin_Stock")">
+                    <th scope="row">
+                        <a asp-page="/Productos/Detalle" asp-route-id="@linea.ProductoId">@linea.Nombre</a>
+                        @if (!linea.HayStockSuficiente)
+                        {
+                            <p class="Etiq_Agotado">
+                                @(linea.StockDisponible == 0 ? "Agotado" : $"Solo quedan {linea.StockDisponible}")
+                            </p>
+                        }
+                    </th>
+                    <td data-etiqueta="Precio">@linea.PrecioUnitario.ToString("C")</td>
+                    <td data-etiqueta="Cantidad">
+                        <form method="post" asp-page-handler="Actualizar" class="Form_Cantidad">
+                            <input type="hidden" name="productoId" value="@linea.ProductoId" />
+                            <label for="Cant_@linea.ProductoId" class="Solo_Lector">Cantidad de @linea.Nombre</label>
+                            <input id="Cant_@linea.ProductoId" type="number" name="cantidad" value="@linea.Cantidad"
+                                   min="1" max="@Math.Max(1, linea.StockDisponible)" required />
+                            <button type="submit" class="Btn_Sec">Actualizar</button>
+                        </form>
+                    </td>
+                    <td data-etiqueta="Subtotal">@linea.Subtotal.ToString("C")</td>
+                    <td>
+                        <form method="post" asp-page-handler="Quitar">
+                            <input type="hidden" name="productoId" value="@linea.ProductoId" />
+                            <button type="submit" class="Btn_Sec">Quitar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th scope="row" colspan="3">Total (@Model.Carrito.TotalArticulos @(Model.Carrito.TotalArticulos == 1 ? "artículo" : "artículos"))</th>
+                <td class="Total_Carrito">@Model.Carrito.Total.ToString("C")</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="Acciones_Carrito">
+        <a asp-page="/Index" class="Btn_Sec">Seguir comprando</a>
+        <form method="post" asp-page-handler="Vaciar">
+            <button type="submit" class="Btn_Sec">Vaciar carrito</button>
+        </form>
+        @if (Model.Carrito.PuedePagar)
+        {
+            <a asp-page="/Checkout" class="Btn_Princ">Proceder al pago</a>
+        }
+        else
+        {
+            <p class="Alerta Alerta_Error" role="status">Ajusta las cantidades marcadas para poder pagar.</p>
+        }
+    </div>
+}

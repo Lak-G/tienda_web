@@ -19,6 +19,16 @@ body{
     padding: var(--espacio-md);
 }
 
+/* Oculto a la vista pero legible por lectores de pantalla */
+.Solo_Lector{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
 /* Rejilla mínima del catálogo; el diseño responsivo completo es la fase 6 */
 .Cont_Catalogo{
     display: grid;
