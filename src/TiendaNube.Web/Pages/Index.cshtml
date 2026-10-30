@@ -5,4 +5,86 @@
 }
 
 <h1>Catálogo</h1>
-<p>El catálogo se implementa en la fase 3.</p>
+
+<form class="Form_Busqueda" method="get" role="search">
+    @if (Model.Categoria is not null)
+    {
+        <input type="hidden" name="categoria" value="@Model.Categoria" />
+    }
+    <label for="Campo_Busqueda">Buscar productos</label>
+    <input id="Campo_Busqueda" type="search" name="q" value="@Model.Q" maxlength="100" placeholder="Nombre o descripción" />
+    <button type="submit" class="Btn_Princ">Buscar</button>
+</form>
+
+<nav class="Lista_Categorias" aria-label="Categorías">
+    <a asp-page="/Index" asp-route-q="@Model.Q"
+       aria-current="@(Model.Categoria is null ? "page" : null)">Todas</a>
+    @foreach (var categoria in Model.Categorias)
+    {
+        <a asp-page="/Index" asp-route-categoria="@categoria.Id" asp-route-q="@Model.Q"
+           aria-current="@(Model.Categoria == categoria.Id ? "page" : null)">@categoria.Nombre</a>
+    }
+</nav>
+
+@if (Model.Resultado.TotalElementos == 0)
+{
+    <div class="Estado_Vacio">
+        <p>No encontramos productos con esos filtros.</p>
+        @if (Model.HayFiltros)
+        {
+            <a asp-page="/Index" class="Btn_Sec">Ver todo el catálogo</a>
+        }
+    </div>
+}
+else
+{
+    <p class="Resumen_Resultados">
+        @Model.Resultado.TotalElementos @(Model.Resultado.TotalElementos == 1 ? "producto" : "productos")
+    </p>
+
+    <ul class="Cont_Catalogo">
+        @foreach (var producto in Model.Resultado.Elementos)
+        {
+            <li class="Tarj_Prod">
+                <a asp-page="/Productos/Detalle" asp-route-id="@producto.Id">
+                    @if (string.IsNullOrEmpty(producto.ImagenUrl))
+                    {
+                        <div class="Img_Prod Img_Vacia" aria-hidden="true">Sin imagen</div>
+                    }
+                    else
+                    {
+                        <img class="Img_Prod" src="@producto.ImagenUrl" alt="@producto.Nombre" loading="lazy" />
+                    }
+                    <h2 class="Tarj_Nombre">@producto.Nombre</h2>
+                </a>
+                <p class="Tarj_Categoria">@producto.CategoriaNombre</p>
+                <p class="Tarj_Precio">@producto.Precio.ToString("C")</p>
+                @if (producto.Stock == 0)
+                {
+                    <p class="Etiq_Agotado">Agotado</p>
+                }
+            </li>
+        }
+    </ul>
+
+    @if (Model.Resultado.TotalPaginas > 1)
+    {
+        <nav class="Paginacion" aria-label="Paginación">
+            @if (Model.Resultado.TieneAnterior)
+            {
+                <a asp-page="/Index" asp-route-categoria="@Model.Categoria" asp-route-q="@Model.Q"
+                   asp-route-pagina="@(Model.Resultado.PaginaActual - 1)" rel="prev">Anterior</a>
+            }
+            @for (var i = 1; i <= Model.Resultado.TotalPaginas; i++)
+            {
+                <a asp-page="/Index" asp-route-categoria="@Model.Categoria" asp-route-q="@Model.Q"
+                   asp-route-pagina="@i" aria-current="@(i == Model.Resultado.PaginaActual ? "page" : null)">@i</a>
+            }
+            @if (Model.Resultado.TieneSiguiente)
+            {
+                <a asp-page="/Index" asp-route-categoria="@Model.Categoria" asp-route-q="@Model.Q"
+                   asp-route-pagina="@(Model.Resultado.PaginaActual + 1)" rel="next">Siguiente</a>
+            }
+        </nav>
+    }
+}

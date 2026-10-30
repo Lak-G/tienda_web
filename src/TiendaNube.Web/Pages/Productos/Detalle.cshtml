@@ -1,0 +1,40 @@
+@page "{id:int}"
+@model TiendaNube.Web.Pages.Productos.DetalleModel
+@{
+    ViewData["Title"] = Model.Producto.Nombre;
+}
+
+<nav class="Migas" aria-label="Ruta de navegación">
+    <a asp-page="/Index">Catálogo</a> /
+    <a asp-page="/Index" asp-route-categoria="@Model.Producto.CategoriaId">@Model.Producto.CategoriaNombre</a>
+</nav>
+
+<article class="Detalle_Prod">
+    @if (string.IsNullOrEmpty(Model.Producto.ImagenUrl))
+    {
+        <div class="Img_Detalle Img_Vacia" aria-hidden="true">Sin imagen</div>
+    }
+    else
+    {
+        <img class="Img_Detalle" src="@Model.Producto.ImagenUrl" alt="@Model.Producto.Nombre" />
+    }
+
+    <div class="Detalle_Info">
+        <h1>@Model.Producto.Nombre</h1>
+        <p class="Detalle_Precio">@Model.Producto.Precio.ToString("C")</p>
+
+        @if (Model.Producto.Stock > 0)
+        {
+            <p class="Detalle_Stock">Disponible: @Model.Producto.Stock</p>
+        }
+        else
+        {
+            <p class="Etiq_Agotado">Agotado</p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Producto.Descripcion))
+        {
+            <p class="Detalle_Desc">@Model.Producto.Descripcion</p>
+        }
+    </div>
+</article>

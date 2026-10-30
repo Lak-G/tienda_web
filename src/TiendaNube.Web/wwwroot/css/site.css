@@ -18,3 +18,12 @@ body{
 .Cont_Principal{
     padding: var(--espacio-md);
 }
+
+/* Rejilla mínima del catálogo; el diseño responsivo completo es la fase 6 */
+.Cont_Catalogo{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: var(--espacio-md);
+    padding: 0;
+    list-style: none;
+}
