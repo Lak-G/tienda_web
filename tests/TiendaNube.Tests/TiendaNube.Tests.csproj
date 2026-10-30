@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <!-- Cadena de conexión a tiendanube_test (clave TIENDANUBE_TEST_DB) si no viene de la variable de entorno -->
+    <UserSecretsId>f8a45063-00e8-4714-bb7b-6ccd282f4b8e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
