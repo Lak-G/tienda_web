@@ -1,0 +1,62 @@
+@page
+@model TiendaNube.Web.Pages.Admin.Categorias.IndexModel
+@{
+    ViewData["Title"] = "Categorías";
+}
+
+<h1>Categorías</h1>
+
+<form method="post" asp-page-handler="Crear" class="Form_Admin Form_Linea">
+    <div class="Campo">
+        <label for="Nueva_Categoria">Nueva categoría</label>
+        <input id="Nueva_Categoria" name="nombre" maxlength="100" required />
+    </div>
+    <button type="submit" class="Btn_Princ">Agregar</button>
+</form>
+
+@if (Model.Categorias.Count == 0)
+{
+    <div class="Estado_Vacio">
+        <p>Todavía no hay categorías. Crea la primera para poder registrar productos.</p>
+    </div>
+}
+else
+{
+    <div class="Cont_Tabla">
+        <table class="Tabla_Admin Tabla_Compacta">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col" class="Col_Num">Productos</th>
+                    <th scope="col"><span class="Solo_Lector">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model.Categorias)
+                {
+                    <tr>
+                        <td>
+                            <form method="post" asp-page-handler="Renombrar" class="Form_Cantidad">
+                                <input type="hidden" name="id" value="@c.Id" />
+                                <label for="Cat_@c.Id" class="Solo_Lector">Nombre de la categoría @c.Nombre</label>
+                                <input id="Cat_@c.Id" name="nombre" value="@c.Nombre" maxlength="100" required />
+                                <button type="submit" class="Btn_Sec">Renombrar</button>
+                            </form>
+                        </td>
+                        <td class="Col_Num">@c.CantidadProductos</td>
+                        <td>
+                            @* Solo se puede eliminar una categoría vacía (FK Restrict); la columna Productos ya dice por qué *@
+                            @if (c.CantidadProductos == 0)
+                            {
+                                <form method="post" asp-page-handler="Eliminar">
+                                    <input type="hidden" name="id" value="@c.Id" />
+                                    <button type="submit" class="Btn_Sec Btn_Peligro">Eliminar</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

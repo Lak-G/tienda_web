@@ -1,0 +1,48 @@
+@page
+@model TiendaNube.Web.Pages.Admin.Ordenes.IndexModel
+@inject TiendaNube.Web.Services.HoraLocal HoraLocal
+@{
+    ViewData["Title"] = "Órdenes";
+}
+
+<h1>Órdenes</h1>
+
+@if (Model.Resultado.TotalElementos == 0)
+{
+    <div class="Estado_Vacio">
+        <p>Todavía no hay órdenes. Aparecerán aquí cuando un cliente complete una compra.</p>
+    </div>
+}
+else
+{
+    <div class="Cont_Tabla">
+        <table class="Tabla_Admin">
+            <caption>@Model.Resultado.TotalElementos @(Model.Resultado.TotalElementos == 1 ? "orden" : "órdenes"), de la más reciente a la más antigua</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Orden</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col" class="Col_Num">Artículos</th>
+                    <th scope="col" class="Col_Num">Total</th>
+                    <th scope="col">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model.Resultado.Elementos)
+                {
+                    <tr>
+                        <th scope="row"><a asp-page="Detalle" asp-route-id="@o.Id">#@o.Id</a></th>
+                        <td>@HoraLocal.Formatear(o.Fecha)</td>
+                        <td>@o.ClienteNombre</td>
+                        <td class="Col_Num">@o.Articulos</td>
+                        <td class="Col_Num">@o.Total.ToString("C")</td>
+                        <td>@o.Estado</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_PaginacionAdmin" model="Model.Resultado" />
+}

@@ -1,0 +1,20 @@
+@{
+    Layout = "_Layout";
+    var paginaActual = ViewContext.RouteData.Values["page"] as string ?? string.Empty;
+    string? Actual(string seccion) => paginaActual.StartsWith(seccion, StringComparison.Ordinal) ? "page" : null;
+}
+
+<nav class="Nav_Admin" aria-label="Panel de administración">
+    <ul>
+        <li><a asp-page="/Admin/Index" aria-current="@(paginaActual == "/Admin/Index" ? "page" : null)">Stock</a></li>
+        <li><a asp-page="/Admin/Productos/Index" aria-current="@Actual("/Admin/Productos")">Productos</a></li>
+        <li><a asp-page="/Admin/Categorias/Index" aria-current="@Actual("/Admin/Categorias")">Categorías</a></li>
+        <li><a asp-page="/Admin/Ordenes/Index" aria-current="@Actual("/Admin/Ordenes")">Órdenes</a></li>
+    </ul>
+    <form method="post" asp-page="/Admin/Logout" class="Form_Salir">
+        <span class="Usuario_Admin">@User.Identity?.Name</span>
+        <button type="submit" class="Btn_Sec">Cerrar sesión</button>
+    </form>
+</nav>
+
+@RenderBody()

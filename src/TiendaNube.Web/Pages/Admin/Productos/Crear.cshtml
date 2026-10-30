@@ -1,0 +1,18 @@
+@page
+@model TiendaNube.Web.Pages.Admin.Productos.CrearModel
+@{
+    ViewData["Title"] = "Nuevo producto";
+}
+
+<h1>Nuevo producto</h1>
+
+<form method="post" enctype="multipart/form-data" class="Form_Admin Form_Producto">
+    <div asp-validation-summary="ModelOnly" class="Alerta Alerta_Error" role="alert"></div>
+
+    <partial name="_FormularioProducto" for="Producto" />
+
+    <div class="Acciones_Form">
+        <button type="submit" class="Btn_Princ">Crear producto</button>
+        <a asp-page="Index" class="Btn_Sec">Cancelar</a>
+    </div>
+</form>

@@ -8,6 +8,8 @@ public class OrdenResumen
     public EstadoOrden Estado { get; init; }
     public string ClienteNombre { get; init; } = string.Empty;
     public string ClienteCorreo { get; init; } = string.Empty;
+    public string? ClienteTelefono { get; init; }
+    public string? ClienteDireccion { get; init; }
     public IReadOnlyList<LineaOrden> Lineas { get; init; } = [];
 }
 

@@ -1,0 +1,75 @@
+@model TiendaNube.Web.Models.ViewModels.ProductoFormulario
+@{
+    var categorias = (IEnumerable<SelectListItem>)ViewData["Categorias"]!;
+}
+
+<input type="hidden" asp-for="Id" />
+<input type="hidden" asp-for="Version" />
+
+<fieldset>
+    <legend>Datos del producto</legend>
+
+    <div class="Campo">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" maxlength="150" required />
+        <span asp-validation-for="Nombre" class="Error_Campo"></span>
+    </div>
+
+    <div class="Campo">
+        <label asp-for="Descripcion"></label>
+        <textarea asp-for="Descripcion" rows="4" maxlength="1000"></textarea>
+        <span asp-validation-for="Descripcion" class="Error_Campo"></span>
+    </div>
+
+    <div class="Campos_Fila">
+        <div class="Campo">
+            <label asp-for="Precio">Precio (MXN)</label>
+            <input asp-for="Precio" type="number" step="0.01" min="0.01" inputmode="decimal" required />
+            <span asp-validation-for="Precio" class="Error_Campo"></span>
+        </div>
+
+        <div class="Campo">
+            <label asp-for="Stock"></label>
+            <input asp-for="Stock" type="number" step="1" min="0" inputmode="numeric" required />
+            <span asp-validation-for="Stock" class="Error_Campo"></span>
+        </div>
+    </div>
+
+    <div class="Campo">
+        <label asp-for="CategoriaId"></label>
+        <select asp-for="CategoriaId" asp-items="categorias" required>
+            <option value="">Selecciona una categoría</option>
+        </select>
+        <span asp-validation-for="CategoriaId" class="Error_Campo"></span>
+    </div>
+
+    <div class="Campo Campo_Check">
+        <input asp-for="Activo" />
+        <label asp-for="Activo"></label>
+    </div>
+</fieldset>
+
+<fieldset>
+    <legend>Imagen</legend>
+
+    @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+    {
+        <img src="@Model.ImagenUrl" alt="Imagen actual de @Model.Nombre" class="Img_Previa" />
+    }
+
+    <div class="Campo">
+        <label for="Imagen">Subir archivo</label>
+        <input id="Imagen" name="Imagen" type="file" accept="image/jpeg,image/png,image/webp,image/gif" aria-describedby="Ayuda_Imagen" />
+        <p id="Ayuda_Imagen" class="Ayuda_Campo">JPG, PNG, WebP o GIF de hasta 2 MB. Si subes un archivo, reemplaza la URL.</p>
+    </div>
+
+    <div class="Campo">
+        <label asp-for="ImagenUrl">O pega una URL</label>
+        <input asp-for="ImagenUrl" type="text" inputmode="url" maxlength="500" placeholder="https://…" />
+        <span asp-validation-for="ImagenUrl" class="Error_Campo"></span>
+        @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+        {
+            <p class="Ayuda_Campo">Borra la URL para quitar la imagen.</p>
+        }
+    </div>
+</fieldset>

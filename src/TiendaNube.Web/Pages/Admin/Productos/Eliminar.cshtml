@@ -1,0 +1,30 @@
+@page "{id:int}"
+@model TiendaNube.Web.Pages.Admin.Productos.EliminarModel
+@{
+    ViewData["Title"] = $"Eliminar {Model.Producto.Nombre}";
+}
+
+<h1>Eliminar producto</h1>
+
+<div class="Form_Admin Confirmacion_Eliminar">
+    <p class="Pregunta_Eliminar">¿Eliminar «@Model.Producto.Nombre»?</p>
+
+    @if (Model.Producto.SeraBorradoLogico)
+    {
+        <p>
+            Este producto aparece en @Model.Producto.OrdenesAsociadas @(Model.Producto.OrdenesAsociadas == 1 ? "orden" : "órdenes").
+            Para conservar el historial no se borrará: se ocultará del catálogo y podrás volver a mostrarlo desde «Editar».
+        </p>
+    }
+    else
+    {
+        <p>No tiene órdenes asociadas, así que se borrará definitivamente junto con su imagen.</p>
+    }
+
+    <form method="post" class="Acciones_Form">
+        <button type="submit" class="Btn_Princ Btn_Peligro">
+            @(Model.Producto.SeraBorradoLogico ? "Ocultar producto" : "Eliminar definitivamente")
+        </button>
+        <a asp-page="Index" class="Btn_Sec">Cancelar</a>
+    </form>
+</div>

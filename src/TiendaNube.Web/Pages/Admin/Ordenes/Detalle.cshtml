@@ -1,0 +1,49 @@
+@page "{id:int}"
+@model TiendaNube.Web.Pages.Admin.Ordenes.DetalleModel
+@inject TiendaNube.Web.Services.HoraLocal HoraLocal
+@{
+    ViewData["Title"] = $"Orden #{Model.Orden.Id}";
+}
+
+<p class="Migas"><a asp-page="Index">Órdenes</a> / #@Model.Orden.Id</p>
+<h1>Orden #@Model.Orden.Id</h1>
+
+<dl class="Datos_Orden">
+    <div><dt>Fecha</dt><dd>@HoraLocal.Formatear(Model.Orden.Fecha)</dd></div>
+    <div><dt>Estado</dt><dd>@Model.Orden.Estado</dd></div>
+    <div><dt>Cliente</dt><dd>@Model.Orden.ClienteNombre</dd></div>
+    <div><dt>Correo</dt><dd><a href="mailto:@Model.Orden.ClienteCorreo">@Model.Orden.ClienteCorreo</a></dd></div>
+    <div><dt>Teléfono</dt><dd>@(Model.Orden.ClienteTelefono ?? "—")</dd></div>
+    <div><dt>Dirección</dt><dd>@(Model.Orden.ClienteDireccion ?? "—")</dd></div>
+</dl>
+
+<div class="Cont_Tabla">
+    <table class="Tabla_Admin">
+        <caption>Productos</caption>
+        <thead>
+            <tr>
+                <th scope="col">Producto</th>
+                <th scope="col" class="Col_Num">Precio al comprar</th>
+                <th scope="col" class="Col_Num">Cantidad</th>
+                <th scope="col" class="Col_Num">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var linea in Model.Orden.Lineas)
+            {
+                <tr>
+                    <th scope="row">@linea.Producto</th>
+                    <td class="Col_Num">@linea.PrecioUnitario.ToString("C")</td>
+                    <td class="Col_Num">@linea.Cantidad</td>
+                    <td class="Col_Num">@linea.Subtotal.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th scope="row" colspan="3">Total</th>
+                <td class="Col_Num Total_Carrito">@Model.Orden.Total.ToString("C")</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

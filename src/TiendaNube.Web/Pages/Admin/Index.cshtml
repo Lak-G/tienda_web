@@ -1,0 +1,49 @@
+@page
+@model TiendaNube.Web.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Stock actual";
+}
+
+<h1>Stock actual</h1>
+<p class="Resumen_Resultados">Ordenado de menor a mayor existencia. Stock bajo: @TiendaNube.Web.Pages.Admin.IndexModel.StockBajo unidades o menos.</p>
+
+<div class="Cont_Tabla">
+    <table class="Tabla_Admin">
+        <thead>
+            <tr>
+                <th scope="col">Producto</th>
+                <th scope="col">Categoría</th>
+                <th scope="col" class="Col_Num">Stock</th>
+                <th scope="col">Estado</th>
+                <th scope="col"><span class="Solo_Lector">Acciones</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Resultado.Elementos)
+            {
+                <tr>
+                    <th scope="row">@p.Nombre</th>
+                    <td>@p.CategoriaNombre</td>
+                    <td class="Col_Num">
+                        @if (p.Stock == 0)
+                        {
+                            <span class="Etiq_Agotado">Agotado</span>
+                        }
+                        else if (p.Stock <= TiendaNube.Web.Pages.Admin.IndexModel.StockBajo)
+                        {
+                            <span class="Etiq_Bajo">@p.Stock · bajo</span>
+                        }
+                        else
+                        {
+                            @p.Stock
+                        }
+                    </td>
+                    <td>@(p.Activo ? "Visible" : "Oculto")</td>
+                    <td><a asp-page="/Admin/Productos/Editar" asp-route-id="@p.Id">Editar</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<partial name="_PaginacionAdmin" model="Model.Resultado" />

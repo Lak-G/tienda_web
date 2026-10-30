@@ -720,11 +720,6 @@ legend{
     .Tabla_Carrito tfoot td:empty{
         display: none;
     }
-
-    .Tabla_Admin{
-        display: block;
-        overflow-x: auto;
-    }
 }
 
 .Acciones_Carrito{
@@ -790,6 +785,295 @@ legend{
     font-variant-numeric: tabular-nums;
 }
 
+/* ---------- Panel admin ---------- */
+
+.Nav_Admin{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espacio-md);
+    margin-bottom: var(--espacio-lg);
+    padding: var(--espacio-sm);
+    background: var(--color-tinta);
+    border: var(--borde);
+}
+
+.Nav_Admin ul{
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espacio-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.Nav_Admin a{
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 var(--espacio-md);
+    color: var(--color-acento);
+    font-weight: 800;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+}
+
+.Nav_Admin a:hover{
+    text-decoration: underline;
+}
+
+.Nav_Admin a[aria-current="page"]{
+    background: var(--color-acento);
+    color: var(--color-tinta);
+}
+
+.Nav_Admin :focus-visible{
+    outline-color: var(--color-acento);
+}
+
+.Form_Salir{
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-sm);
+}
+
+.Usuario_Admin{
+    color: var(--color-acento);
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.Form_Salir .Btn_Sec{
+    min-height: 2.25rem;
+    box-shadow: none;
+}
+
+.Encabezado_Seccion{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espacio-md);
+    margin-bottom: var(--espacio-lg);
+}
+
+.Encabezado_Seccion h1{
+    margin: 0;
+}
+
+.Cont_Login{
+    max-width: 28rem;
+    margin: 0 auto;
+}
+
+/* La tabla admin conserva sus columnas y se desplaza dentro de su contenedor en pantallas angostas */
+.Cont_Tabla{
+    /* relative: los textos .Solo_Lector (absolutos) de la tabla quedan dentro del área con scroll
+       en vez de ensanchar todo el documento */
+    position: relative;
+    overflow-x: auto;
+    margin-bottom: var(--espacio-lg);
+    padding: 0 6px 6px 0;
+}
+
+.Cont_Tabla .Tabla_Admin{
+    margin-bottom: 0;
+    min-width: 36rem;
+}
+
+.Tabla_Admin tbody tr + tr{
+    border-top: var(--borde-fino);
+}
+
+.Tabla_Admin tbody th{
+    font-weight: 700;
+}
+
+.Col_Num{
+    text-align: right !important;
+    white-space: nowrap;
+}
+
+.Fila_Inactiva{
+    color: var(--color-tinta-suave);
+    background: var(--color-acento);
+}
+
+.Etiq_Bajo{
+    padding: var(--espacio-xs) var(--espacio-sm);
+    border: var(--borde-fino);
+    background: var(--color-acento);
+    font-weight: 800;
+}
+
+.Acciones_Fila{
+    white-space: nowrap;
+}
+
+.Acciones_Fila a + a{
+    margin-left: var(--espacio-md);
+}
+
+.Form_Producto{
+    max-width: 44rem;
+}
+
+.Campos_Fila{
+    display: grid;
+    gap: 0 var(--espacio-md);
+}
+
+.Campo_Check{
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-sm);
+}
+
+.Campo_Check input{
+    width: 1.5rem;
+    min-height: 1.5rem;
+    margin: 0;
+    accent-color: var(--color-tinta);
+}
+
+.Campo_Check label{
+    margin: 0;
+}
+
+.Img_Previa{
+    width: 10rem;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    margin-bottom: var(--espacio-md);
+    border: var(--borde);
+    background: var(--color-acento);
+}
+
+.Ayuda_Campo{
+    margin: var(--espacio-xs) 0 0;
+    color: var(--color-tinta-suave);
+    font-size: 0.875rem;
+}
+
+input[type="file"]{
+    padding: var(--espacio-sm);
+    cursor: pointer;
+}
+
+input[type="file"]::file-selector-button{
+    margin-right: var(--espacio-md);
+    padding: var(--espacio-xs) var(--espacio-md);
+    border: var(--borde-fino);
+    background: var(--color-tinta);
+    color: var(--color-acento);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.Acciones_Form{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--espacio-md);
+}
+
+.Btn_Peligro{
+    border-color: var(--color-error);
+}
+
+.Btn_Princ.Btn_Peligro{
+    background: var(--color-error);
+    color: var(--color-acento);
+}
+
+.Btn_Princ.Btn_Peligro:hover{
+    background: var(--color-acento);
+    color: var(--color-error);
+}
+
+.Btn_Sec.Btn_Peligro{
+    color: var(--color-error);
+}
+
+.Enlace_Peligro{
+    margin-left: auto;
+    color: var(--color-error);
+    font-weight: 700;
+}
+
+.Form_Linea{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--espacio-md);
+    margin-bottom: var(--espacio-lg);
+}
+
+.Form_Linea .Campo{
+    flex: 1 1 14rem;
+    margin: 0;
+}
+
+/* Tabla con formularios en celda: no se desplaza, el formulario se acomoda en dos renglones si no cabe */
+.Cont_Tabla .Tabla_Compacta{
+    min-width: 0;
+}
+
+/* En tablas automáticas el ancho intrínseco del input (size=20) fija la columna;
+   con ancho porcentual no la ensancha y el botón baja al siguiente renglón */
+@media (max-width: 47.99rem){
+    .Tabla_Admin.Tabla_Compacta .Form_Cantidad input{
+        flex-basis: 100%;
+        width: 100%;
+    }
+}
+
+.Tabla_Admin .Form_Cantidad{
+    flex-wrap: wrap;
+}
+
+.Tabla_Admin .Form_Cantidad input{
+    width: auto;
+    flex: 1 1 10rem;
+}
+
+.Confirmacion_Eliminar{
+    max-width: 40rem;
+}
+
+.Pregunta_Eliminar{
+    font-size: 1.375rem;
+    font-weight: 800;
+}
+
+.Datos_Orden{
+    display: grid;
+    gap: var(--espacio-md);
+    margin: 0 0 var(--espacio-lg);
+    padding: var(--espacio-md);
+    background: var(--color-superficie);
+    border: var(--borde);
+    box-shadow: var(--sombra);
+}
+
+.Datos_Orden dt{
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-tinta-suave);
+}
+
+.Datos_Orden dd{
+    margin: 0;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
 /* ---------- Escritorio ---------- */
 
 @media (min-width: 48rem){
@@ -826,6 +1110,15 @@ legend{
 
     .Cont_Checkout{
         grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+
+    .Campos_Fila{
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .Datos_Orden{
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        padding: var(--espacio-lg);
     }
 
     .Form_Checkout,

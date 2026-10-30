@@ -1,0 +1,64 @@
+@page
+@model TiendaNube.Web.Pages.Admin.Productos.IndexModel
+@{
+    ViewData["Title"] = "Productos";
+    if (!string.IsNullOrWhiteSpace(Model.Q))
+    {
+        ViewData["RutaPaginacion"] = new Dictionary<string, string> { ["q"] = Model.Q };
+    }
+}
+
+<div class="Encabezado_Seccion">
+    <h1>Productos</h1>
+    <a asp-page="Crear" class="Btn_Princ">Nuevo producto</a>
+</div>
+
+<form class="Form_Busqueda" method="get" role="search">
+    <label for="Campo_Busqueda">Buscar por nombre</label>
+    <input id="Campo_Busqueda" type="search" name="q" value="@Model.Q" maxlength="100" />
+    <button type="submit" class="Btn_Princ">Buscar</button>
+</form>
+
+@if (Model.Resultado.TotalElementos == 0)
+{
+    <div class="Estado_Vacio">
+        <p>@(string.IsNullOrWhiteSpace(Model.Q) ? "Todavía no hay productos." : "Ningún producto coincide con la búsqueda.")</p>
+        <a asp-page="Crear" class="Btn_Sec">Crear producto</a>
+    </div>
+}
+else
+{
+    <div class="Cont_Tabla">
+        <table class="Tabla_Admin">
+            <caption>@Model.Resultado.TotalElementos @(Model.Resultado.TotalElementos == 1 ? "producto" : "productos")</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Categoría</th>
+                    <th scope="col" class="Col_Num">Precio</th>
+                    <th scope="col" class="Col_Num">Stock</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col"><span class="Solo_Lector">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.Resultado.Elementos)
+                {
+                    <tr class="@(p.Activo ? null : "Fila_Inactiva")">
+                        <th scope="row">@p.Nombre</th>
+                        <td>@p.CategoriaNombre</td>
+                        <td class="Col_Num">@p.Precio.ToString("C")</td>
+                        <td class="Col_Num">@p.Stock</td>
+                        <td>@(p.Activo ? "Visible" : "Oculto")</td>
+                        <td class="Acciones_Fila">
+                            <a asp-page="Editar" asp-route-id="@p.Id">Editar</a>
+                            <a asp-page="Eliminar" asp-route-id="@p.Id">Eliminar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_PaginacionAdmin" model="Model.Resultado" />
+}

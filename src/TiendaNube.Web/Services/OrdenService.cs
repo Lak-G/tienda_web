@@ -110,6 +110,38 @@ public class OrdenService(AppDbContext db, ILogger<OrdenService> logger) : IOrde
         }
     }
 
+    public async Task<PaginaResultado<OrdenFila>> ListarAsync(int pagina, int tamanoPagina = 20)
+    {
+        var total = await _db.Ordenes.CountAsync();
+        var totalPaginas = Math.Max(1, (int)Math.Ceiling(total / (double)tamanoPagina));
+        var paginaActual = Math.Clamp(pagina, 1, totalPaginas);
+
+        var elementos = await _db.Ordenes
+            .AsNoTracking()
+            .OrderByDescending(o => o.Fecha)
+            .ThenByDescending(o => o.Id)
+            .Skip((paginaActual - 1) * tamanoPagina)
+            .Take(tamanoPagina)
+            .Select(o => new OrdenFila
+            {
+                Id = o.Id,
+                Fecha = o.Fecha,
+                ClienteNombre = o.Cliente!.Nombre,
+                Articulos = o.Detalles.Sum(d => d.Cantidad),
+                Total = o.Total,
+                Estado = o.Estado
+            })
+            .ToListAsync();
+
+        return new PaginaResultado<OrdenFila>
+        {
+            Elementos = elementos,
+            PaginaActual = paginaActual,
+            TotalPaginas = totalPaginas,
+            TotalElementos = total
+        };
+    }
+
     public async Task<OrdenResumen?> ObtenerResumenAsync(int ordenId)
     {
         return await _db.Ordenes
@@ -123,6 +155,8 @@ public class OrdenService(AppDbContext db, ILogger<OrdenService> logger) : IOrde
                 Estado = o.Estado,
                 ClienteNombre = o.Cliente!.Nombre,
                 ClienteCorreo = o.Cliente.Correo,
+                ClienteTelefono = o.Cliente.Telefono,
+                ClienteDireccion = o.Cliente.Direccion,
                 Lineas = o.Detalles
                     .OrderBy(d => d.Id)
                     .Select(d => new LineaOrden

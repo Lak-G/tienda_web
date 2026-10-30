@@ -1,6 +1,14 @@
 namespace TiendaNube.Web.Models.ViewModels;
 
-public class PaginaResultado<T>
+public interface IPaginado
+{
+    int PaginaActual { get; }
+    int TotalPaginas { get; }
+    bool TieneAnterior { get; }
+    bool TieneSiguiente { get; }
+}
+
+public class PaginaResultado<T> : IPaginado
 {
     public IReadOnlyList<T> Elementos { get; init; } = [];
     public int PaginaActual { get; init; }

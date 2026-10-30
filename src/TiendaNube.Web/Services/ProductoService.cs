@@ -7,8 +7,6 @@ namespace TiendaNube.Web.Services;
 
 public class ProductoService(AppDbContext db) : IProductoService
 {
-    private const int LargoMaximoBusqueda = 100;
-
     private readonly AppDbContext _db = db;
 
     public async Task<IReadOnlyList<Categoria>> ObtenerCategoriasAsync()
@@ -26,10 +24,10 @@ public class ProductoService(AppDbContext db) : IProductoService
         if (categoriaId is not null)
             consulta = consulta.Where(p => p.CategoriaId == categoriaId);
 
-        var termino = NormalizarBusqueda(busqueda);
+        var termino = Busqueda.Normalizar(busqueda);
         if (termino is not null)
         {
-            var patron = $"%{EscaparPatronLike(termino)}%";
+            var patron = Busqueda.PatronContiene(termino);
             consulta = consulta.Where(p =>
                 EF.Functions.ILike(p.Nombre, patron, @"\") ||
                 (p.Descripcion != null && EF.Functions.ILike(p.Descripcion, patron, @"\")));
@@ -82,17 +80,4 @@ public class ProductoService(AppDbContext db) : IProductoService
             })
             .FirstOrDefaultAsync();
     }
-
-    private static string? NormalizarBusqueda(string? busqueda)
-    {
-        if (string.IsNullOrWhiteSpace(busqueda))
-            return null;
-
-        var termino = busqueda.Trim();
-        return termino.Length > LargoMaximoBusqueda ? termino[..LargoMaximoBusqueda] : termino;
-    }
-
-    // Sin escapar, una búsqueda de "%" o "_" coincidiría con todo el catálogo
-    private static string EscaparPatronLike(string texto) =>
-        texto.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");
 }

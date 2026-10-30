@@ -1,0 +1,29 @@
+@page
+@model TiendaNube.Web.Pages.Admin.LoginModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Acceso administrador";
+}
+
+<div class="Cont_Login">
+    <h1>Acceso administrador</h1>
+
+    <form method="post" class="Form_Admin">
+        <div asp-validation-summary="ModelOnly" class="Alerta Alerta_Error" role="alert"></div>
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <div class="Campo">
+            <label asp-for="Usuario"></label>
+            <input asp-for="Usuario" autocomplete="username" autofocus />
+            <span asp-validation-for="Usuario" class="Error_Campo"></span>
+        </div>
+
+        <div class="Campo">
+            <label asp-for="Contrasena"></label>
+            <input asp-for="Contrasena" autocomplete="current-password" />
+            <span asp-validation-for="Contrasena" class="Error_Campo"></span>
+        </div>
+
+        <button type="submit" class="Btn_Princ">Entrar</button>
+    </form>
+</div>

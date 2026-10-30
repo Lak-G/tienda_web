@@ -1,0 +1,24 @@
+@model TiendaNube.Web.Models.ViewModels.IPaginado
+@{
+    // Parámetros extra (por ejemplo la búsqueda) que deben conservarse al cambiar de página
+    var rutaBase = ViewData["RutaPaginacion"] as Dictionary<string, string> ?? new Dictionary<string, string>();
+    Dictionary<string, string> Ruta(int pagina) => new(rutaBase) { ["pagina"] = pagina.ToString() };
+}
+
+@if (Model.TotalPaginas > 1)
+{
+    <nav class="Paginacion" aria-label="Paginación">
+        @if (Model.TieneAnterior)
+        {
+            <a asp-all-route-data="Ruta(Model.PaginaActual - 1)" rel="prev">Anterior</a>
+        }
+        @for (var i = 1; i <= Model.TotalPaginas; i++)
+        {
+            <a asp-all-route-data="Ruta(i)" aria-current="@(i == Model.PaginaActual ? "page" : null)">@i</a>
+        }
+        @if (Model.TieneSiguiente)
+        {
+            <a asp-all-route-data="Ruta(Model.PaginaActual + 1)" rel="next">Siguiente</a>
+        }
+    </nav>
+}
