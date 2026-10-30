@@ -1,7 +1,9 @@
 using Amazon;
 using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using TiendaNube.Web.Data;
 using TiendaNube.Web.Services;
@@ -64,6 +66,20 @@ builder.Services.AddSession(opciones =>
     opciones.Cookie.IsEssential = true;
     opciones.Cookie.SameSite = SameSiteMode.Lax;
 });
+// Las claves cifran las cookies de admin, sesión y antiforgery; en el EC2 se guardan en disco
+// para que un reinicio del servicio no cierre sesiones ni invalide formularios abiertos
+var rutaClaves = builder.Configuration["DataProtection:RutaClaves"];
+if (!string.IsNullOrWhiteSpace(rutaClaves))
+{
+    builder.Services.AddDataProtection()
+        .SetApplicationName("TiendaNube")
+        .PersistKeysToFileSystem(new DirectoryInfo(rutaClaves));
+}
+
+// Detrás de Nginx: la IP del cliente y el esquema llegan en X-Forwarded-*; solo se confía en el proxy local (loopback)
+builder.Services.Configure<ForwardedHeadersOptions>(opciones =>
+    opciones.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
+
 builder.Services.AddRequestLocalization(opciones =>
 {
     opciones.SetDefaultCulture("es-MX");
@@ -74,6 +90,8 @@ builder.Services.AddRequestLocalization(opciones =>
 var app = builder.Build();
 
 await Semilla.EjecutarAsync(app.Services);
+
+app.UseForwardedHeaders();
 
 if (!app.Environment.IsDevelopment())
 {

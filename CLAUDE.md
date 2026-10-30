@@ -16,17 +16,17 @@ Proyecto escolar de la materia **Cómputo en la Nube** (UABC). Prototipo funcion
 |---|---|
 | Framework | ASP.NET Core **10 (LTS)** con Razor Pages (.NET 8 deja de tener soporte en noviembre de 2026) |
 | ORM | EF Core + Npgsql, con migraciones |
-| BD | PostgreSQL 16, instalado **en la misma instancia EC2**, escuchando solo en `localhost` |
-| Imágenes | Amazon S3 vía `AWSSDK.S3`. Credenciales tomadas del instance profile (`LabInstanceProfile`), **nunca access keys en el código** |
+| BD | **Amazon RDS PostgreSQL 16** (us-east-2), no pública: el 5432 solo acepta conexiones del Security Group del EC2. Conexión con `SSL Mode=Require` |
+| Imágenes | Amazon S3 vía `AWSSDK.S3`, bucket `tiendanube-bucket` (us-east-2). Credenciales tomadas del rol de la instancia (`TiendaNube-EC2-Role`), **nunca access keys en el código** |
 | Auth admin | Cookie authentication simple (sin ASP.NET Identity). Contraseñas con `PasswordHasher<T>` |
 | Carrito | Sesión del servidor (`ISession`, JSON serializado) |
 | Frontend | HTML renderizado en servidor + CSS mínimo. Sin frameworks JS |
 | Servidor | Kestrel como servicio `systemd`, detrás de Nginx (puerto 80) |
-| Infra | EC2 t3.micro (1 GB RAM, Amazon Linux 2023) + bucket S3, en AWS Academy Learner Lab |
+| Infra | EC2 t3.micro (1 GB RAM, Amazon Linux 2023, ya creado y configurado) + RDS PostgreSQL + bucket S3, en AWS Academy Learner Lab, región us-east-2 |
 
 ## Restricción principal: memoria
 
-La instancia tiene 1 GB de RAM y comparte memoria entre la app y Postgres. Por eso:
+La instancia tiene 1 GB de RAM. La BD ya no vive en el EC2 (está en RDS), pero la app sigue compartiendo la máquina con Nginx y el sistema. Por eso:
 
 - Sin Docker en el servidor.
 - En el `.csproj`: `<ServerGarbageCollection>false</ServerGarbageCollection>` y `<ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>`.
@@ -110,13 +110,17 @@ Todo dentro de **una transacción**:
   - `S3AlmacenamientoImagenes` (producción): sube a `s3://{Bucket}/productos/{guid}.{ext}` y devuelve la URL pública.
   - `LocalAlmacenamientoImagenes` (desarrollo): guarda en `wwwroot/uploads`.
 - Se elige según `Almacenamiento:Proveedor` en la configuración.
-- El bucket permite lectura pública solo en el prefijo `productos/`. La escritura va por el rol de la instancia.
+- El bucket `tiendanube-bucket` (us-east-2) permite lectura pública solo en el prefijo `productos/` (política en `deploy/s3-politica-bucket.json`). La escritura va por el rol de la instancia.
 
 ## Configuración y secretos
 
 - `appsettings.json` sin secretos. La cadena de conexión, el bucket y las credenciales del admin semilla vienen de **variables de entorno** (`ConnectionStrings__Default`, `S3__Bucket`, `S3__Region`, `AdminSemilla__Usuario`, `AdminSemilla__Contrasena`).
+- En producción la cadena de conexión apunta a RDS y lleva `SSL Mode=Require`.
+- En el EC2: los valores no secretos (`Almacenamiento__Proveedor=S3`, `S3__Bucket=tiendanube-bucket`, `S3__Region=us-east-2`, `DataProtection__RutaClaves`) van en `deploy/tiendanube.service`; los secretos en `/etc/tiendanube/tiendanube.env` (root:tiendanube, 640; plantilla en `deploy/tiendanube.env.ejemplo`).
+- `DataProtection__RutaClaves` persiste las claves de Data Protection en disco para que un reinicio del servicio no invalide las cookies de admin, sesión y antiforgery.
 - En desarrollo: `dotnet user-secrets`.
-- `.gitignore` estándar de .NET más `publish/` y `wwwroot/uploads/`.
+- Pruebas: la cadena de `tiendanube_test` viene de la variable `TIENDANUBE_TEST_DB` o, si no existe, de los user-secrets del proyecto de pruebas.
+- `.gitignore` estándar de .NET más `publish/`, `wwwroot/uploads/` y `deploy/*.env`. `.gitattributes` fuerza LF en `*.sh`, `*.service`, `*.conf` y en `deploy/`.
 
 ## Estructura del proyecto
 
@@ -138,22 +142,37 @@ TiendaNube/
 │   │                     Categorias, Ordenes/{Index,Detalle}
 │   ├── wwwroot/css/site.css
 │   └── Program.cs
-├── tests/TiendaNube.Tests/   xUnit (carrito, totales, checkout con stock insuficiente)
+├── tests/TiendaNube.Tests/   xUnit
+│   ├── Unitarias/             sin BD: totales, carrito en sesión, validaciones previas del checkout
+│   ├── BaseDatos/             PostgreSQL real (tiendanube_test): checkout, stock, compras simultáneas (xmin), CHECKs
+│   └── Apoyo/                 fixture de BD (recrea el esquema con migraciones), sesión en memoria, punto de encuentro
 └── deploy/
-    ├── setup-ec2.sh           swap, Postgres, Nginx, usuario de servicio
-    ├── postgresql-tuning.conf shared_buffers=64MB, work_mem=2MB, max_connections=20
-    ├── nginx-tiendanube.conf
-    ├── tiendanube.service     unidad systemd con variables de entorno
-    └── publicar.sh            publish + scp + restart
+    ├── setup-ec2.sh           documentación para replicar el EC2: swap, Nginx, cliente psql, libicu, usuario de servicio, systemd
+    ├── nginx-tiendanube.conf  proxy :80 → 127.0.0.1:5000, client_max_body_size 3M
+    ├── tiendanube.service     unidad systemd con variables de entorno no secretas + EnvironmentFile
+    ├── tiendanube.env.ejemplo plantilla de /etc/tiendanube/tiendanube.env (secretos)
+    ├── migraciones.sql        script idempotente de migraciones para RDS
+    ├── publicar.ps1           (Windows) publish linux-x64 self-contained + scp + reinicio por ssh
+    ├── publicar.sh            lo mismo desde Linux/macOS/Git Bash
+    ├── instalar-version.sh    corre en el EC2: instala la versión, conserva la anterior, verifica que responda
+    ├── aplicar-migraciones.sh corre en el EC2: aplica migraciones.sql con la cadena del .env
+    └── s3-politica-bucket.json lectura pública solo en productos/
 ```
+
+## Pruebas
+
+- Las pruebas de checkout corren contra **PostgreSQL real** (`tiendanube_test`, mismo usuario `tienda`), nunca InMemory, porque InMemory no soporta transacciones ni `xmin`. Sin Docker ni Testcontainers.
+- Cada corrida borra el esquema `public` y lo recrea con las migraciones; cada prueba vacía las tablas. El fixture se niega a correr si la BD no termina en `_test`.
+- Lo que no necesita BD (totales, carrito en sesión, validaciones previas) va como prueba unitaria pura.
 
 ## Despliegue (resumen)
 
-1. EC2 t3.micro con Amazon Linux 2023, instance profile `LabInstanceProfile`, Elastic IP.
-2. Security Group: 22 solo desde la IP del equipo, 80 abierto, **5432 cerrado**.
-3. `deploy/setup-ec2.sh`: swap de 1 GB, `dnf install postgresql16-server nginx`, ajustes de Postgres, base de datos y usuario.
-4. Migraciones: generar un script idempotente (`dotnet ef migrations script --idempotent`) y ejecutarlo con `psql` en la instancia.
-5. `deploy/publicar.sh`: publish self-contained → `scp` → `systemctl restart tiendanube`.
+1. **EC2** (`3.146.91.228`, ya preparado con `setup-ec2.sh`): t3.micro, Amazon Linux 2023, swap, Nginx, rol IAM `TiendaNube-EC2-Role` (solo objetos del bucket; no puede leer la configuración del bucket ni de RDS). `deploy/setup-ec2.sh` documenta cómo replicarlo; no instala Postgres, solo el cliente `psql` para las migraciones.
+2. **Security Groups**: EC2 con 22 solo desde la IP del equipo y 80 abierto. RDS con 5432 solo desde el Security Group del EC2.
+3. **RDS PostgreSQL** (us-east-2, `tiendanube-db`): BD `tiendanube`, cuyo dueño es el usuario maestro; `tienda` tiene `GRANT ALL ON SCHEMA public`. Conexión con `SSL Mode=Require`.
+4. **S3**: `tiendanube-bucket` con la política de `deploy/s3-politica-bucket.json`.
+5. **Migraciones**: `dotnet ef migrations script --idempotent -o deploy/migraciones.sql`, se sube al EC2 y se aplica con `sudo bash ~/deploy/aplicar-migraciones.sh`, que lee la cadena del `.env` sin mostrar la contraseña. Antes del primer arranque, porque la semilla corre al iniciar.
+6. **Publicar**: `deploy/publicar.ps1` (Windows) o `deploy/publicar.sh` → publish self-contained linux-x64 → `.tar.gz` por `scp` → `instalar-version.sh` reinicia `tiendanube`.
 
 ## Forma de trabajo
 

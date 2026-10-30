@@ -5,7 +5,7 @@ namespace TiendaNube.Web.Services.Almacenamiento;
 
 /// <summary>
 /// Producción: sube a s3://{Bucket}/productos/{guid}.{ext}. Las credenciales vienen de la cadena
-/// por defecto del SDK (en EC2, el instance profile LabInstanceProfile); nunca hay access keys en el código.
+/// por defecto del SDK (en EC2, el rol de la instancia TiendaNube-EC2-Role); nunca hay access keys en el código.
 /// </summary>
 public class S3AlmacenamientoImagenes(IAmazonS3 s3, IConfiguration configuracion, ILogger<S3AlmacenamientoImagenes> logger)
     : IAlmacenamientoImagenes

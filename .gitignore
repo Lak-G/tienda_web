@@ -486,3 +486,4 @@ publish/
 **/wwwroot/uploads/
 
 .claude/settings.local.json
+deploy/*.env

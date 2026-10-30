@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!-- EC2 t3.micro con 1 GB compartido con Postgres: GC de estación de trabajo, sin GC concurrente -->
+    <!-- EC2 t3.micro con 1 GB de RAM: GC de estación de trabajo, sin GC concurrente -->
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
     <UserSecretsId>54e63baa-08a7-4dd3-b69d-8408e683c314</UserSecretsId>
