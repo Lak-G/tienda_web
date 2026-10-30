@@ -8,11 +8,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TiendaNube</title>
+    <link rel="preload" href="~/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    <a class="Salto_Contenido" href="#Contenido">Saltar al contenido</a>
+
     <header class="Encabezado">
-        <nav class="Nav_Princ">
+        <nav class="Nav_Princ" aria-label="Principal">
             <a class="Nav_Marca" asp-page="/Index">TiendaNube</a>
             <ul class="Nav_Lista">
                 <li><a asp-page="/Index">Catálogo</a></li>
@@ -21,7 +24,7 @@
                         Carrito
                         @if (articulosEnCarrito > 0)
                         {
-                            <span class="Contador_Carrito">(@articulosEnCarrito<span class="Solo_Lector"> artículos</span>)</span>
+                            <span class="Contador_Carrito">@articulosEnCarrito<span class="Solo_Lector"> artículos</span></span>
                         }
                     </a>
                 </li>
@@ -30,7 +33,7 @@
         </nav>
     </header>
 
-    <main class="Cont_Principal">
+    <main id="Contenido" class="Cont_Principal" tabindex="-1">
         @if (TempData["Mensaje"] is string mensaje)
         {
             <p class="Alerta Alerta_Exito" role="status">@mensaje</p>
@@ -43,7 +46,7 @@
     </main>
 
     <footer class="Pie">
-        &copy; @DateTime.Now.Year - TiendaNube
+        <span>&copy; @DateTime.Now.Year TiendaNube</span>
     </footer>
 
     @await RenderSectionAsync("Scripts", required: false)
