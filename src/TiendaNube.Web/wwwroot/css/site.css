@@ -1,0 +1,20 @@
+/* Estilos completos en la fase 6 */
+:root{
+    --color-fondo: #ffffff;
+    --color-texto: #1f2933;
+    --color-primario: #1d4ed8;
+    --espacio-sm: 0.5rem;
+    --espacio-md: 1rem;
+    --espacio-lg: 2rem;
+}
+
+body{
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: var(--color-fondo);
+    color: var(--color-texto);
+}
+
+.Cont_Principal{
+    padding: var(--espacio-md);
+}

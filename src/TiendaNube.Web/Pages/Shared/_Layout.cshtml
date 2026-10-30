@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TiendaNube</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="Encabezado">
+        <nav class="Nav_Princ">
+            <a class="Nav_Marca" asp-page="/Index">TiendaNube</a>
+            <ul class="Nav_Lista">
+                <li><a asp-page="/Index">Catálogo</a></li>
+                <li><a href="/Carrito">Carrito</a></li>
+                <li><a href="/Admin">Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="Cont_Principal">
+        @RenderBody()
+    </main>
+
+    <footer class="Pie">
+        &copy; @DateTime.Now.Year - TiendaNube
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
